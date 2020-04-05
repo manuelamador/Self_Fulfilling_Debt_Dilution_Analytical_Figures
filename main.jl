@@ -248,7 +248,7 @@ function get_hybrid_eqm(m, q_low, b_max_b, b_max_s, b_b, b_s, v_b, q_b)
         end 
     end 
     q_h = function (b) 
-        if b < b_h 
+        if b <= b_h 
             1.0 
         else
             q_b(b)
@@ -500,7 +500,7 @@ function make_fig_borrowing_q(s)
                 mark_options= "{line width=1pt, fill=white, scale=1.2}"
             },
             Coordinates(
-                [(0.0, 1.0)]
+                [(0.0, s.q_b(0.0 - 0.00001))]
             )
         ),
         # solid marker
@@ -556,22 +556,24 @@ function make_fig_savings_q(s)
                 [(b, s.q_s(b)) for b in range(s.b_i+0.001, s.b_max_s, length=10)]
             )
         ),
+        # white marker
         PlotInc(
             {
                 style="blue", mark="*", 
                 mark_options= "{line width=1pt, fill=white, scale=1.2}"
             },
             Coordinates(
-                [(s.b_i, s.q_low)]
+                [(s.b_i, s.q_s(s.b_i + 0.0001))]
             )
         ),
+        # solid marker 
         PlotInc(
             {
                 style="blue", mark="*", 
                 mark_options= "{line width=1pt, solid, scale=1.2}"
             },
             Coordinates(
-                [(s.b_i, s.q_s(s.b_i - 0.001))]
+                [(s.b_i, s.q_s(s.b_i))]
             )
         ),
         [
@@ -617,22 +619,24 @@ function make_fig_hybrid_q(s)
                 [(b, s.q_h(b)) for b in range(s.b_h+0.001, s.b_max_b, length=300)]
             )
         ),
+        # solid marker
         PlotInc(
             {
                 style="blue", mark="*", 
                 mark_options= "{line width=1pt, solid, scale=1.2}"
             },
             Coordinates(
-                [(s.b_h, 1.0)]
+                [(s.b_h, s.q_h(s.b_h))]
             )
         ),
+        # white marker
         PlotInc(
             {
                 style="blue", mark="*", 
                 mark_options= "{line width=1pt, fill=white, scale=1.2}"
             },
             Coordinates(
-                [(s.b_h, s.q_h(s.b_h))]
+                [(s.b_h, s.q_h(s.b_h + 0.001))]
             )
         ),
         [
@@ -1018,6 +1022,25 @@ function make_joint_surplus_borrowing(s)
 end
 
 
+
+function display_figures(; m=Model())
+    sol = get_all(m)
+    return [
+        make_fig_borrowing_v(sol),
+        make_fig_borrowing_q(sol),
+        make_fig_borrowing_c(sol),
+        make_fig_savings_v(sol),
+        make_fig_savings_q(sol),
+        make_fig_savings_c(sol),
+        make_fig_hybrid_v(sol),
+        make_fig_hybrid_q(sol),
+        make_fig_hybrid_c(sol),
+        make_joint_surplus_borrowing(sol),
+        make_joint_surplus_savings(sol)
+    ]
+end 
+
+
 function save_figures(; m=Model(), dir="Figures")
 
     f(x) = joinpath("Figures", x)
@@ -1039,9 +1062,8 @@ function save_figures(; m=Model(), dir="Figures")
     pgfsave(f("plotPS.pdf"), make_joint_surplus_savings(sol))
 end 
 
-
 push!(
     PGFPlotsX.CUSTOM_PREAMBLE, 
     "\\usepackage{libertine}\\usepackage[libertine]{newtxmath}"
 )
-save_figures()
+

@@ -2,11 +2,7 @@
 
 The code is written in Julia 1.4. 
 
-You need the following packages:
-
-    Parameters
-    PGFPlotsX
-    Roots
+You need the following packages: `Parameters`, `PGFPlotsX`, `Roots`.
 
 As well as a working LaTeX installation. 
 
@@ -17,5 +13,10 @@ The code generates figures 1, 2, 3, 4 and D.1 from
 
 The file `main.jl` uses the analytical closed-form solutions in the paper 
 to make and save the figures to the `Figures` subdirectory. 
+
+In the Julia prompt, run:
+
+    include("main.jl")
+    save_figures() # output the figures to the Figure subdirectory
 
 
